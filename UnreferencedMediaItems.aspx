@@ -194,6 +194,10 @@
                         }
                     }
                 }
+                if(chkRemoveMediaFolder.Checked)
+                {
+                    RecycleMediaFolder();
+                }
                 LoadUnreferencedItems();
                 lblMessage.Text = "Selected item(s) has been moved to Recycle bin. You can restore the item from Recycle bin.";
             }
@@ -203,6 +207,9 @@
             }
 
         }
+
+
+
 
         /// <summary>
         /// Deletes the media item permanently
@@ -235,6 +242,10 @@
                         }
                     }
                 }
+                if(chkRemoveMediaFolder.Checked)
+                {
+                    DeleteMediaFolder();
+                }
                 LoadUnreferencedItems();
                 lblMessage.Text = "Selected item(s) has been permanently deleted.";
             }
@@ -244,6 +255,59 @@
             }
 
         }
+
+     /// <summary>
+        /// Deletes Empty Media folders
+        /// </summary>
+        private void DeleteMediaFolder()
+        {
+            string mediaItemrootpath = "/sitecore/media library/";
+            if (!string.IsNullOrEmpty(txtmediarootpath.Text))
+            {
+                mediaItemrootpath = txtmediarootpath.Text;
+            }
+            //Get the media library item
+            Item MediaLibrary = currentDB.GetItem(mediaItemrootpath);
+
+            foreach (Item MedItm in MediaLibrary.Axes.GetDescendants())
+            {
+                if (MedItm.TemplateID.ToString().ToUpper().Equals("{FE5DD826-48C6-436D-B87A-7C4210C7413B}") || MedItm.TemplateName.ToString().ToLower().Equals("media folder"))
+                {
+                    if (!MedItm.HasChildren && MedItm.Children.Count == 0)
+                    {
+                        MedItm.Delete();
+                    }
+                }
+            }
+
+        }
+
+            /// <summary>
+        /// Recycles Empty Media folders
+        /// </summary>
+        private void RecycleMediaFolder()
+        {
+            string mediaItemrootpath = "/sitecore/media library/";
+            if (!string.IsNullOrEmpty(txtmediarootpath.Text))
+            {
+                mediaItemrootpath = txtmediarootpath.Text;
+            }
+            //Get the media library item
+            Item MediaLibrary = currentDB.GetItem(mediaItemrootpath);
+
+            foreach (Item MedItm in MediaLibrary.Axes.GetDescendants())
+            {
+                if (MedItm.TemplateID.ToString().ToUpper().Equals("{FE5DD826-48C6-436D-B87A-7C4210C7413B}") || MedItm.TemplateName.ToString().ToLower().Equals("media folder"))
+                {
+                    if (!MedItm.HasChildren && MedItm.Children.Count == 0)
+                    {
+                        MedItm.Recycle();
+                    }
+                }
+            }
+
+        }
+
 
         /// <summary>
         /// Deletes all the items from Recycle Bin
@@ -503,6 +567,14 @@
                     </div>
                     <div class="col-sm-8">
                         <asp:CheckBox ID="chkIncludeSystem" runat="server" />
+                    </div>
+                </div>
+                  <div class="row">
+                    <div class="col-sm-4">
+                        <label for="chkRemoveMediaFolder" title="Do you want to delete/recycle empty Media Folders?">Do you want to delete/recycle empty Media Folders?</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <asp:CheckBox ID="chkRemoveMediaFolder" runat="server" />
                     </div>
                 </div>
                  <div class="row">
